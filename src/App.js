@@ -1,8 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import {BsThermometer, BsEye, BsWind, BsTropicalStorm, BsCloudDrizzleFill, BsCloudHaze2Fill, BsWater} from "react-icons/bs";
+import {
+    BsThermometer,
+    BsEye,
+    BsWind,
+    BsTropicalStorm,
+    BsCloudDrizzleFill,
+    BsCloudHaze2Fill,
+    BsWater
+} from "react-icons/bs";
 import {ImSpinner9} from "react-icons/im";
-import {IoMdRainy, IoMdSunny, IoMdCloudy, IoMdThunderstorm, IoMdSnow} from "react-icons/io";
+import {IoMdRainy, IoMdSunny, IoMdCloudy, IoMdThunderstorm, IoMdSnow, IoMdSearch} from "react-icons/io";
 import {TbTemperatureCelsius, TbMist, TbCloudFog, TbTornado} from "react-icons/tb";
 
 //initiating variable for API Key
@@ -11,10 +19,22 @@ const APIKey = '722cf3cab03dd7cd2782b7c6963d3078';
 //fetching data from API
 const App = () => {
     const [data, setData] = useState();
+    const [input, setInput] = useState('');
     const [city, setCity] = useState('Sidoarjo');
 
+    const inputHandler = (e) => {
+        setInput(e.target.value);
+    }
+    // console.log(input);
+    const searchHandler = (e) => {
+        if(input !== ''){
+            setCity(input);
+        }
+        e.preventDefault();
+    }
+
     useEffect(() => {
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${APIKey}`;
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
         axios.get(url).then((res) => {
             setData(res.data);
             console.log(res.data);
@@ -22,7 +42,7 @@ const App = () => {
     }, []);
 
     useEffect(() => {
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${APIKey}`;
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
         axios.get(url).then((res) => {
             setData(res.data);
         });
@@ -66,72 +86,120 @@ const App = () => {
         }
     }
 
+    const date = new Date();
+    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    let day = weekday[date.getDay()];
+
     return (
         <>
-            {!data ? (
-                <div className="loading bg-blue min-h-screen flex flex-col justify-center items-center">
-                    <div>
-                        <ImSpinner9 className="text-4xl animate-spin"/>
+            <div
+                className="bg-blue w-full bg-cover px-6 lg:px-0 min-h-screen flex flex-col justify-center items-center ">
+                <form
+                    className="h-16 bg-black/[.2] w-full max-w-[48-px] lg:max-w-2xl rounded-3xl backdrop-blur-[40px] mb-4">
+                    <div className="flex text-2xl items-center py-3 pl-12 pr-3 relative h-full ">
+                        <input onChange={(e)=> inputHandler(e)} type="text" placeholder="Search a City or Country"
+                               className="flex flex-1 bg-transparent placeholder:text-gray text-white outline-none "/>
+
+                        <button onClick={(e)=> searchHandler(e)}
+                            className="w-32 h-12 flex justify-center items-center hover:bg-[#5dbea3] transition bg-[#33b249] text-center rounded-3xl">
+                            <IoMdSearch size={32} color={"white"}/>
+                        </button>
                     </div>
-                </div>
-            ) : (
-                <div>
-                    <div className="bg-blue min-h-screen flex flex-col justify-center items-center">
-                        {/*<div className="text-6xl text-white my-14 font-bold">*/}
-                        {/*    SIDICA*/}
-                        {/*</div>*/}
+                </form>
 
-                        <div>
-                            <div className="flex">
-                                <div>
-                                    <WeatherIcon size={140} color={"white"} data={data}/>
-                                </div>
-                                <div className="pl-8 flex flex-col justify-center">
-                                    <div className="text-white text-3xl font-semibold">Location</div>
-                                    <div className="text-white text-2xl font-light">Date Time</div>
-                                </div>
+                <div
+                    className="w-full max-w-[480px] lg:max-w-2xl bg-black/[.2] min-h-[584px] text-white backdrop-blur-[40px] rounded-3xl py-8 px-12">
+                    {!data ? (
+                        //Bisa jadi Component
+                        <div className="min-h-[500px] flex justify-center items-center ">
+                            <div>
+                                <ImSpinner9 className="text-4xl animate-spin"/>
                             </div>
+                        </div>
+                    ) : (
+                        <div className="">
+                            {/*<div className="text-6xl text-white my-14 font-bold">*/}
+                            {/*    SIDICA*/}
+                            {/*</div>*/}
 
-                            <div className="flex flex-col items-center mb-8">
-                                <div className="flex">
-                                    <div className="text-white text-9xl font-normal">14</div>
+                            <div>
+                                <div className="flex gap-x-8">
                                     <div>
-                                        <TbTemperatureCelsius size={28} color={"white"} />
+                                        <WeatherIcon size={140} color={"white"} data={data}/>
+                                    </div>
+                                    <div className="flex flex-col justify-center">
+                                        <div
+                                            className="text-white text-3xl font-semibold">{data.name}, {data.sys.country}</div>
+                                        <div className="text-white text-2xl font-light">
+                                            {day} , {date.getUTCDate()}/{date.getUTCMonth() + 1}/{date.getUTCFullYear()}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="text-white text-2xl font-light">Description</div>
-                            </div>
 
-                            <div className="flex flex-row divide-x-2 divide-white ">
-                                <div className="flex-col divide-white mb-4 ">
-                                    <div className="flex items-center flex-1">
-                                        <div className="mx-4 "><BsEye size={42} color={"white"} /></div>
-                                        <div className="mr-3 text-[32px] font-thin text-white">Visibility</div>
-                                        <div className="mx-3 text-[32px] font-thin text-white flex justify-end w-full">10km</div>
+                                <div className="flex flex-col items-center my-4">
+                                    <div className="flex">
+                                        <div className="text-white text-9xl font-normal leading-none">
+                                            {parseInt(data.main.temp)}
+                                        </div>
+                                        <div>
+                                            <TbTemperatureCelsius size={28} color={"white"}/>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center flex-1">
-                                        <div className="mx-4 "><BsThermometer size={42} color={"white"} /></div>
-                                        <div className="mr-3 text-[32px] font-thin text-white">Feels like</div>
-                                        <div className="mx-3 text-[32px] font-thin text-white">10km</div>
+                                    <div className="text-2xl font-light capitalize text-center">
+                                        {data.weather[0].description}
                                     </div>
                                 </div>
-                                <div className="flex-col divide-white ">
-                                    <div className="flex items-center flex-1">
-                                        <div className="mx-4 "><BsWater size={42} color={"white"} /></div>
-                                        <div className="mr-3 text-[32px] font-thin text-white">Humidity</div>
-                                        <div className="mx-3 text-[32px] font-thin text-white flex justify-end w-full">10km</div>
+
+                                <div className="flex flex-col max-w-[576px] mx-1 my-12 gap-y-6 justify-center">
+                                    <div className="flex justify-between ">
+                                        <div className="flex items-center gap-x-2">
+                                            <div className="mx-4 "><BsThermometer size={42} color={"white"}/></div>
+                                            <div className="mr-3 text-[24px] font-thin flex">
+                                                Feels like
+                                                <div className="ml-2 flex font-normal">
+                                                    {parseInt(data.main.feels_like)}
+                                                    <TbTemperatureCelsius size={26} color={"white"}/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-x-2">
+                                            <div className="mx-4 "><BsEye size={42} color={"white"}/></div>
+                                            <div className="mr-3 text-[24px] font-thin ">
+                                                Visibility
+                                                <span className="ml-2 font-normal">
+                                                    {(data.visibility) / 1000} km
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center flex-1">
-                                        <div className="mx-4 "><BsWind size={42} color={"white"} /></div>
-                                        <div className="mr-3 text-[32px] font-thin text-white ">Wind</div>
-                                        <div className="mx-3 text-[32px] font-thin text-white flex justify-end w-full">10km</div>
+                                    <div className="flex justify-between ">
+                                        <div className="flex items-center gap-x-2">
+                                            <div className="mx-4 "><BsWind size={42} color={"white"}/></div>
+                                            <div className="mr-3 text-[24px] font-thin ">
+                                                Wind
+                                                <span className="ml-1 font-normal w-full">
+                                                    {data.wind.speed}
+                                                    <span className="ml-1 text-xl">m/s</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-x-2">
+                                            <div className="mx-4 "><BsWater size={42} color={"white"}/></div>
+                                            <div className="mr-3 text-[24px] font-thin w-full">
+                                                Humidity
+                                                <span className="ml-2 font-normal">
+                                                    {data.main.humidity} %
+                                                </span>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
-            )}
+            </div>
         </>
     );
 };
